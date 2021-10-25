@@ -1,3 +1,4 @@
+from typing import List
 class Solution:
     #3:35 - 3:54
     #Runtime 5.49% Memory: 5.68%
