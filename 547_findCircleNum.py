@@ -32,7 +32,7 @@ class Solution(object):
         
 
         return len(ans)
-    
+    #use dfs to go through each node and find the number of islands
     def findCircleNum_dfs(self, isConnected):
         """
         :type isConnected: List[List[int]]
@@ -51,6 +51,48 @@ class Solution(object):
                 count += 1
                 dfs(i)
         return count
+        
+    #Runtime: 80.40% Memory: 72.60%
+    #Use a disjoint set, construct a disjoint_set list to contain the parents of each node, and a rank list to contain the size of each disjoint set. Union two nodes if they don't have the same parent and based on their rank. Use path compression to shorten the search time.
+    def findCircleNum_disjointset(self, isConnected: List[List[int]]) -> int:
+        N = len(isConnected)
+        disjoint_set = [i for i in range(N)]
+        rank = [1 for i in range(N)]
+        
+        def findParent(i, disjoint_set):
+            if disjoint_set[i] == i:
+                return i
+            #update parent for path compression
+            p = findParent(disjoint_set[i], disjoint_set)
+            disjoint_set[i] = p
+            return disjoint_set[i]
+        
+        def union(i, j, disjoint_set, rank):
+            p1 = findParent(i, disjoint_set)
+            p2 = findParent(j, disjoint_set)
+            rank1 = rank[p1]
+            rank2 = rank[p2]
+            if p1 != p2:
+                if rank1 >= rank2:
+                    disjoint_set[p2] = p1
+                    rank[p1] = rank1 + rank2
+                    rank[p2] = -1
+                elif rank1 < rank2:
+                    disjoint_set[p1] = p2
+                    rank[p1] = -1
+                    rank[p2] = rank1 + rank2
+        
+        for i in range(N):
+            for j in range(i + 1, N):
+                if isConnected[i][j]:
+                    union(i, j, disjoint_set, rank)
+        
+        count = 0
+        for i in range(N):
+            if rank[i] >= 0:
+                count += 1
+        return count
+                        
 
 if __name__ == "__main__":
     print("hello")
